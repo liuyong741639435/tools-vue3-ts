@@ -1,28 +1,22 @@
 <script setup lang="ts" name="MapCells">
-import { CellState, CellStateColor } from "../../type";
-import { useCells } from "./cells";
+import { ref } from "vue";
+import { CellStateColor, PathStatus } from "../../../../type/map-edit";
+import { cells, cellSize, editCellState } from "./cells";
 
-const { cells, cellSize } = useCells();
-// 当前点击会把格子状态改成什么状态
-const editCellState = CellState.obstacle
-function tese(cell: any, index: number) {
-    console.log(cell, index);
-    cell.state = editCellState
-    console.log('cell.state', cell.state);
-}
-CellStateColor
 </script>
 
 <template>
   <div class="MapCells">
-    <div
-      class="cell"
-      v-for="(cell, index) of cells"
-      :key="index"
-      :style="`width: ${cellSize.width}px; height: ${cellSize.height}px; background-color: ${CellStateColor[cell.state]}`"
-      :class="CellStateColor[cell.state]"
-      @click="tese(cell, index)"
-    />
+    <div class="row"
+      v-for="(row, rowIndex) of cells"
+      :key="rowIndex"
+      >
+      <div class="cell" v-for="(cell, cellIndex) of row"
+      :key="cellIndex" :style="`width: ${cellSize.width}px; height: ${cellSize.height}px; background-color: ${CellStateColor[cell]?.color}`"
+      :class="CellStateColor[cell]"
+      @click="changeCellState(row, cellIndex)">
+      </div>
+    </div>
   </div>
 </template>
 

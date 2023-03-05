@@ -1,23 +1,8 @@
-// 地图路径状态
-export enum PathStatus {
-  empty, // 可通行
-  obstacle, // 障碍物
-  passed, // 走过的
-  boundary, // 边界
-}
-// 坐标
-export interface Coordinate {
-  x: number;
-  y: number;
-}
-
-export interface CoordinateObj extends Coordinate {
-  pre?: CoordinateObj; // 从哪个坐标走到本坐标的
-  cost: number; // 走到这里的代价
-}
+import { Coordinate, CoordinateObj, PathStatus } from "../type/map-edit";
 
 // 计算2个点之间的距离
 function calculateDistance(c1: Coordinate, c2: Coordinate = { x: 0, y: 0 }) {
+  console.log(c1, Math.sqrt((c1.x - c2.x) ** 2 + (c1.y - c2.y) ** 2))
   return Math.sqrt((c1.x - c2.x) ** 2 + (c1.y - c2.y) ** 2);
 }
 
@@ -80,7 +65,7 @@ export default class Astart {
       let maxValue = calculateDistance(queue[0], end);
       queue.forEach((item, index) => {
         let temp = calculateDistance(item, end);
-        if (temp > maxValue) {
+        if (temp < maxValue) {
           maxValue = temp;
           maxindex = index;
         }
@@ -160,11 +145,11 @@ export default class Astart {
   }
 }
 
-const aStart = new Astart([
-  [0, 1, 1, 0],
-  [1, 0, 1, 0],
-  [1, 0, 1, 0],
-  [0, 0, 0, 0],
-]);
+// const aStart = new Astart([
+//   ['0', '1', '1', '0'],
+//   ['1', '0, '1', '0'],
+//   ['1', '0', '1', '0'],
+//   ['0', '0', '0', '0'],
+// ]);
 
-console.log("aStart", aStart.nav({ x: 0, y: 0 }, { x: 3, y: 3 }));
+// console.log("aStart", aStart.nav({ x: 0, y: 0 }, { x: 3, y: 3 }));

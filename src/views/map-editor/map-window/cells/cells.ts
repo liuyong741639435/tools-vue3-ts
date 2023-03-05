@@ -1,42 +1,82 @@
-import { ref } from "vue";
+import { reactive, Ref, ref } from "vue";
 import { useMapEditorStore } from "../../../../store/map-editor";
-import { CellState } from "../../type";
+import Astart from "../../../../tools/astart";
+import { PathStatus } from "../../../../type/map-edit";
 
-function getCells(x: number, y: number, state: CellState) {
-    const cells: { x: number; y: number; state: CellState }[] = []
-    for( let currX = 0; currX < x; currX++) {
-        for(let currY = 0; currY < y; currY++ ) {
-            cells.push({
-                x: currX,
-                y: currY,
-                state // todo 后续用枚举
-            })
+function getCells(x: number, y: number) {
+    const cells: PathStatus[][] = []
+    for (let currX = 0; currX < x; currX++) {
+        let temp: PathStatus[] = []
+        for (let currY = 0; currY < y; currY++) {
+            temp.push(PathStatus.empty)
         }
+        cells.push(temp)
     }
     return cells
 }
 
-export function useCells() {
+export const cells: Ref<PathStatus[][]> = ref([])
+export const cellSize = reactive({
+    width: 10,
+    height: 10
+})
+
+// 当前点击会把格子状态改成什么状态
+export const editCellState = ref(PathStatus.obstacle)
+
+export function updateCells(cellsNumber: {
+    x: number;
+    y: number;
+}) {
     const mapEditor = useMapEditorStore()
-    // 取文件宽高
     const { width, height } = mapEditor.$state.imgsSize
-
-    // 读取x轴和y轴格子数量
-    const cellsNumber = {
-        x: 9,
-        y: 6
-    }
-    
-    // 获得格子参数 格子默认为可以移动
-    const cells = ref(getCells(cellsNumber.x, cellsNumber.y, CellState.portability))
+    cells.value = getCells(cellsNumber.x, cellsNumber.y)
     // 格子大小
-    const cellSize = {
-        width: width / cellsNumber.x,
-        height: height / cellsNumber.y
-    }
+    cellSize.width = width / cellsNumber.x,
+        cellSize.height = height / cellsNumber.y
+}
 
-    return {
-        cells,
-        cellSize
+export function changeEditCellState(pathStatus: PathStatus) {
+    editCellState.value = pathStatus
+}
+
+// 生成地图
+export function generateMap() {
+    console.log('cells:', cells.value)
+}
+
+// 导航
+export function mapNav() {
+    const astart = new Astart(cells.value)
+    const nav = astart.nav({ x: 0, y: 0 }, { x: 5, y: 8 })
+    console.log('nav:', nav);
+    if (nav.data) {
+        updateWindow(nav.data)
     }
+}
+
+// 显示导航记录
+export function updateWindow(data: {
+    x: number;
+    y: number;
+}[]) {
+    data.forEach(({x, y}) => {
+        cells.value[y][x] = PathStatus.passed
+    })
+}
+
+// 设置格子的状态
+const start = ref<{x: number; y:number} | null>(null)
+const end = ref<{x: number; y:number} | null>(null)
+
+function changeCellState(row: any, index: number) {
+  // 设置起点和终点，都需要先清除之前的起点或者终点
+  if (editCellState.value === PathStatus.start) {
+
+  } else if (editCellState.value === PathStatus.end) {
+
+  } else {
+    row[index] = editCellState.value
+  }
+    
 }

@@ -7,7 +7,7 @@ const mapEditorStore = useMapEditorStore()
 <template>
   <div class="MapWindow" :style="`width:${mapEditorStore.imgsSize.width}px; height:${mapEditorStore.imgsSize.height}px`">
     <!-- 图片 -->
-    <MapImgs />
+    <!-- <MapImgs /> -->
     <!-- 方格 -->
     <MapCells />
   </div>
